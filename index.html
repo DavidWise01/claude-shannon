@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Shannon — Boolean algebra becomes the circuit</title>
+<meta name="description" content="LOGIKĒ XII (the closer) — Claude Shannon (1916–2001). His 1937 master's thesis showed that Boole's algebra of 0 and 1 IS the algebra of electrical switches: a switch is a bit, series wiring is AND, parallel is OR — so any logical function can be built and, crucially, MINIMISED as a circuit. That single insight is the foundation of every digital computer and the literal birth of the logic gate. In 1948 he founded information theory and named the bit. Live: a switching circuit (series=AND, parallel=OR), an exact Boolean minimiser that shrinks a circuit by algebra, and an entropy meter. This closes the LOGIKĒ lineage Thales→…→the gate, folding logic into PSĒPHOS. David Lee Wise, two-layer honest.">
+<style>
+  :root{--bg:#0c0f17;--panel:#121622;--panel2:#19202f;--edge:#2a3346;--ink:#ede6d6;--dim:#b3ad9a;--faint:#7c7660;
+    --ochre:#d9b66a;--ochre2:#f0d79a;--proof:#5ad1ff;--proof2:#a7e6ff;--one:#7fe0a0;--zero:#fb7185;--amber:#fbbf24;--ember:#fb923c;
+    --mono:'SFMono-Regular',ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;--serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.58;background-image:radial-gradient(1100px 560px at 75% -10%,#1c2436 0%,transparent 55%),radial-gradient(900px 500px at 0% 100%,#14110a 0%,transparent 55%);}
+  .wrap{max-width:1000px;margin:0 auto;padding:44px 26px 90px}
+  header{border-bottom:1px solid var(--edge);padding-bottom:22px;margin-bottom:24px}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--ochre);opacity:.95}
+  h1{font-family:Georgia,serif;font-size:38px;line-height:1.08;margin:.3em 0 .14em;font-weight:600}h1 em{color:var(--ochre2);font-style:italic}
+  .who{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.04em}
+  .sub{color:var(--dim);font-size:16px;max-width:74ch;margin-top:14px}.sub b{color:var(--ink)}
+  .verdicts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:22px 0}@media(max-width:720px){.verdicts{grid-template-columns:1fr}}
+  .vc{border:1px solid var(--edge);border-radius:11px;padding:13px 15px;border-top-width:3px;background:rgba(18,22,34,.6)}
+  .vc .badge{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em}
+  .vc.s{border-top-color:var(--one)}.vc.s .badge{color:var(--one)} .vc.m{border-top-color:var(--amber)}.vc.m .badge{color:var(--amber)} .vc.f{border-top-color:var(--ember)}.vc.f .badge{color:var(--ember)}
+  .vc p{font-size:12px;color:var(--dim);margin:6px 0 0;line-height:1.45}.vc p b{color:var(--ink)}
+  section{margin:36px 0}
+  h2{font-size:13px;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--ochre2);border-left:2px solid var(--ochre);padding-left:11px;margin:0 0 6px}
+  .lede{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:80ch}
+  .panel{background:linear-gradient(180deg,var(--panel),#0a0d14);border:1px solid var(--edge);border-radius:14px;padding:20px;box-shadow:0 24px 60px -40px #000}
+  .controls{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:14px}
+  button{font-family:var(--mono);font-size:12px;color:var(--ink);background:#1a2030;border:1px solid var(--edge);border-radius:8px;padding:8px 13px;cursor:pointer}button:hover{background:#222b3e;border-color:var(--ochre)}
+  button.on{border-color:var(--ochre);background:#2a2414;color:var(--ochre2)}
+  .sw{font-family:var(--mono);font-size:13px;padding:8px 14px;border-radius:8px;border:1px solid var(--edge);background:#1a2030;color:var(--zero);cursor:pointer;min-width:64px}
+  .sw.closed{color:var(--one);border-color:#2f5b40;background:#0d1a12}
+  .circuit{display:block;margin:6px auto 2px;max-width:100%}
+  .lamp-label{text-align:center;font-family:var(--mono);font-size:13px;color:var(--dim);margin-top:4px}
+  .lamp-label b{color:var(--ochre2)}
+  .expr{font-family:var(--mono);font-size:20px;color:var(--proof2);background:#0c1622;border:1px solid var(--edge);border-radius:9px;padding:13px;text-align:center;min-height:50px;letter-spacing:1px;margin-top:12px}
+  .tbl{border-collapse:collapse;font-family:var(--mono);font-size:13px;margin:14px auto 0}
+  .tbl th,.tbl td{border:1px solid var(--edge);padding:5px 12px;text-align:center;color:var(--dim)}
+  .tbl th{color:var(--ochre);font-weight:700}.tbl td.lit{background:#2a2414;color:var(--ochre2)}
+  .tbl td.outone{color:var(--one)}.tbl td.outzero{color:var(--zero)}
+  .ttclick td.o{cursor:pointer}.ttclick td.o:hover{outline:1px solid var(--ochre)}
+  .mini{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}@media(max-width:620px){.mini{grid-template-columns:1fr}}
+  .mbox{border:1px solid var(--edge);border-radius:10px;padding:14px;background:rgba(0,0,0,.14);text-align:center}
+  .mbox .ml{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--faint)}
+  .mbox .mexpr{font-family:var(--mono);font-size:17px;color:var(--proof2);margin:7px 0;min-height:24px}
+  .mbox .mcount{font-family:var(--mono);font-size:12px;color:var(--dim)}.mbox.win{border-color:#2f5b40}.mbox.win .mcount{color:var(--one)}
+  .note{color:var(--dim);font-size:13.5px;border-left:2px solid var(--edge);padding-left:13px;margin:16px 0 0}.note b{color:var(--ink)}
+  .ent{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center}
+  input[type=range]{accent-color:var(--ochre);width:240px}
+  .meter{font-family:var(--mono);font-size:13px;color:var(--dim)}.meter b{color:var(--ochre2);font-size:16px}
+  .thm{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}@media(max-width:620px){.thm{grid-template-columns:1fr}}
+  .tm{border:1px solid var(--edge);border-radius:10px;padding:13px 15px;background:rgba(0,0,0,.14)}.tm b{color:var(--ochre2);font-family:var(--mono);font-size:11px}.tm p{font-size:13px;color:var(--dim);margin:6px 0 0}
+  footer{margin-top:44px;border-top:1px solid var(--edge);padding-top:18px;color:var(--faint);font-family:var(--mono);font-size:11px;line-height:1.7}
+  footer a,.bar2 a{color:var(--ochre)}.bar2{font-family:var(--mono);font-size:11.5px;margin-bottom:16px}.bar2 a{text-decoration:none;border-bottom:1px dotted #4a4126}
+  code{font-family:var(--mono);color:var(--ochre2);background:#15120a;padding:1px 5px;border-radius:5px}
+  blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid var(--ochre);color:var(--ink);font-style:italic;font-size:15px}
+  .close{background:linear-gradient(180deg,#15130b,#0a0d14);border:1px solid #3a3220;border-radius:14px;padding:20px 22px;margin-top:10px}
+  .close h3{font-family:Georgia,serif;font-size:19px;color:var(--ochre2);margin:0 0 8px}
+  .chain{font-family:var(--mono);font-size:12.5px;color:var(--dim);line-height:1.9}.chain b{color:var(--ochre2)}.chain a{color:var(--ochre);text-decoration:none;border-bottom:1px dotted #4a4126}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="bar2"><a href="https://davidwise01.github.io/ud0/">◄ UD0</a> &nbsp; <a href="https://davidwise01.github.io/alan-turing/">← Turing</a> &nbsp; LOGIKĒ · XII · the closer</div>
+<header>
+  <div class="kicker">LOGIKĒ · XII · Boolean algebra becomes the circuit</div>
+  <h1>Claude <em>Shannon</em></h1>
+  <div class="who">1916 – 2001 · Michigan &amp; MIT &amp; Bell Labs · "A Symbolic Analysis of Relay and Switching Circuits", 1937 · "A Mathematical Theory of Communication", 1948</div>
+  <div class="sub">Boole made logic an algebra of 0 and 1. Eighty years later a 21-year-old MIT student wrote what's been called the most important master's thesis ever — and it was a single, devastating observation: <b>a switch is a bit.</b> An electrical switch is open (0) or closed (1); wire two in <b>series</b> and current flows only if both are closed — that's <b>AND</b>; wire them in <b>parallel</b> and current flows if either is closed — that's <b>OR</b>. So Boole's algebra of thought is <em>literally</em> the algebra of circuits, which means any logical function can be <b>built</b> from switches — and, crucially, <b>simplified</b> by algebra into fewer parts. That is the logic gate, and every digital computer, born on paper in 1937. A decade later he did it again: he founded <b>information theory</b> and named the <b>bit</b>.</div>
+</header>
+<div class="verdicts">
+  <div class="vc s"><span class="badge">✓ STRONG</span><p><b>The keystone, and exact.</b> Switching algebra (1937) and information theory (1948) are rigorous and foundational — between them they define how every computer computes and how every channel communicates.</p></div>
+  <div class="vc m"><span class="badge">◐ BUILT ON BOOLE</span><p><b>He bridged, didn't invent the algebra.</b> The logic is Boole's; Shannon's genius was seeing it <em>is</em> the algebra of switches — the engineering link. Information theory, by contrast, he built largely from scratch.</p></div>
+  <div class="vc f"><span class="badge">◔ "BIT" HAS LIMITS</span><p><b>A precise engineering quantity.</b> Shannon entropy measures <em>uncertainty / message length</em> — not meaning, truth, or value. "Information" in his sense is not the everyday word; conflating them is a common error.</p></div>
+</div>
+
+<section>
+  <h2>I · A switch is a bit — series is AND, parallel is OR</h2>
+  <p class="lede">The whole 1937 thesis in one panel. Two switches, <b>A</b> and <b>B</b>; click to open (0) or close (1). Choose how they're wired — <b>series</b> or <b>parallel</b> — and optionally invert. The lamp lights exactly when current can flow, and that condition <em>is</em> a Boolean expression. This is the moment logic stopped being philosophy and became hardware.</p>
+  <div class="panel">
+    <div class="controls">
+      <span style="font-family:var(--mono);font-size:12px;color:var(--faint)">switches:</span>
+      <button class="sw closed" id="swA">A · 1</button>
+      <button class="sw closed" id="swB">B · 1</button>
+      <span style="flex:1"></span>
+      <button id="mSer" class="on">series · AND</button>
+      <button id="mPar">parallel · OR</button>
+      <button id="mNot">invert lamp · NOT</button>
+    </div>
+    <svg class="circuit" id="cir" viewBox="0 0 520 180" width="520" height="180"></svg>
+    <div class="lamp-label">lamp is <b id="lampState">ON</b> &nbsp;·&nbsp; current flows iff the expression is 1</div>
+    <div class="expr" id="expr">A · B</div>
+    <table class="tbl" id="tt1"></table>
+    <div class="note">Series = both closed = <b>AND</b>. Parallel = either closed = <b>OR</b>. A switch in the <em>broken</em> position = <b>NOT</b>. Three wiring patterns reproduce the entire truth table — and a <b>relay</b> (a switch driven by another circuit) lets one gate's output drive the next, which is all a processor is. This panel is the literal ancestor of every gate in <a href="https://davidwise01.github.io/ud0/">PSĒPHOS</a>.</div>
+  </div>
+</section>
+
+<section>
+  <h2>II · The algebra shrinks the circuit</h2>
+  <p class="lede">Shannon's thesis didn't just <em>build</em> circuits — it <b>minimised</b> them. Each relay cost money, space, and reliability, so reducing a Boolean expression meant a cheaper machine. Define any function of A and B by clicking its four outputs; the naive build (one AND-gate per true row, all OR'd) sits on the left, and the algebra's minimal form on the right. Watch the gate count fall — and note honestly when it <em>can't</em> (some functions, like XOR, are already minimal).</p>
+  <div class="panel">
+    <table class="tbl ttclick" id="tt2"></table>
+    <div class="mini">
+      <div class="mbox" id="mNaive"><div class="ml">NAÏVE — SUM OF PRODUCTS</div><div class="mexpr" id="naiveExpr"></div><div class="mcount" id="naiveCount"></div></div>
+      <div class="mbox win" id="mMin"><div class="ml">MINIMISED BY ALGEBRA</div><div class="mexpr" id="minExpr"></div><div class="mcount" id="minCount"></div></div>
+    </div>
+    <div class="note" id="mNote">Click the <b>OUT</b> cells above to change the function. The reduction (e.g. <code>A·B + A·B̄ = A</code>) is exact Boolean algebra — the same automatic minimisation a logic-synthesis tool runs on a billion-transistor chip today.</div>
+  </div>
+</section>
+
+<section>
+  <h2>III · The bit — measuring information itself (1948)</h2>
+  <p class="lede">Eleven years on, Shannon asked a deeper question: how much <em>information</em> is in a message? His answer founded an entire field. A fair coin carries exactly <b>one bit</b> of uncertainty; a two-headed coin carries <b>zero</b> (you already know the outcome). The measure is the <b>entropy</b> <code>H(p) = −p·log₂p − (1−p)·log₂(1−p)</code> — maximal at p = ½, vanishing at certainty. Drag the coin's bias and watch the information it carries.</p>
+  <div class="panel">
+    <div class="ent">
+      <div class="meter">P(heads) = <b id="pVal">0.50</b></div>
+      <input type="range" id="bias" min="0" max="1" step="0.01" value="0.5">
+      <div class="meter">information = <b id="hVal">1.000</b> bits</div>
+    </div>
+    <svg id="entbar" viewBox="0 0 520 80" width="520" height="80" style="display:block;margin:14px auto 0;max-width:100%"></svg>
+    <div class="note"><b>The bit is the unit of all of this.</b> Boole's 0/1 became Shannon's switch became Shannon's <em>bit</em> — the atom of computing and communication alike. Entropy also sets the hard floor on compression (you cannot losslessly squeeze a message below its entropy) and the ceiling on a channel's capacity. ⚠ <b>Honest:</b> this "information" is uncertainty/message-length — <em>not</em> meaning or importance; a page of noise has high entropy and no sense.</div>
+  </div>
+  <blockquote>"I just wondered how things were put together." <span style="color:var(--faint);font-style:normal;font-size:12px">— Claude Shannon</span></blockquote>
+</section>
+
+<section>
+  <h2>IV · The keystone, the man, and the loop closes</h2>
+  <div class="thm">
+    <div class="tm"><b>1937 · THE GATE</b><p>Boolean algebra <b>is</b> switching algebra — logic becomes a circuit you can build and minimise. The foundation of all digital design; the birth certificate of the logic gate.</p></div>
+    <div class="tm"><b>1948 · THE BIT</b><p>Information has a precise measure — entropy — and a unit, the <b>bit</b>. Compression limits, channel capacity, error correction: the whole digital age rests on it.</p></div>
+  </div>
+  <p class="note" style="border-color:var(--amber);margin-top:16px"><b style="color:var(--amber)">Gate kept on.</b> Two clarities. The <b>algebra is Boole's</b> — Shannon's 1937 leap was the <em>bridge</em> (this algebra is the algebra of switches), an act of recognition as profound as an invention, but a bridge nonetheless; the 1948 information theory, by contrast, was his own near-from-scratch creation. And <b>"information" is a technical term</b>: Shannon entropy measures uncertainty and message length, <em>not</em> meaning, truth, or worth — the most common abuse of his work is to read the everyday word into the equation. The man: a playful tinkerer who built a juggling-machine, a maze-solving mechanical mouse, and a rocket-powered frisbee, rode a unicycle down the Bell Labs halls, and treated genius as recreation. He gave the machine age both of its halves and seemed to regard it as the most natural fun in the world.</p>
+  <div class="close">
+    <h3>The loop closes — Thales to the gate</h3>
+    <div class="chain">
+      <a href="https://davidwise01.github.io/thales-of-miletus/">Thales</a> proves the first theorem · <a href="https://davidwise01.github.io/aristotle/">Aristotle</a> formalises the syllogism · <a href="https://davidwise01.github.io/euclid/">Euclid</a> the axiomatic method · <a href="https://davidwise01.github.io/chrysippus/">Chrysippus</a> propositional logic &amp; the truth table · <a href="https://davidwise01.github.io/ramon-llull/">Llull</a> the first logic machine · <a href="https://davidwise01.github.io/leibniz/">Leibniz</a> "let us calculate" + binary · <a href="https://davidwise01.github.io/george-boole/">Boole</a> logic = algebra of 0/1 · <a href="https://davidwise01.github.io/augustus-de-morgan/">De Morgan</a> the duality &amp; NAND · <a href="https://davidwise01.github.io/gottlob-frege/">Frege</a> quantifiers &amp; predicate logic · <a href="https://davidwise01.github.io/kurt-godel/">Gödel</a> the limits of proof · <a href="https://davidwise01.github.io/alan-turing/">Turing</a> the universal machine · <b>Shannon — the gate.</b><br><br>
+      <b>2,500 years of walking logic into mathematics arrives at the switch.</b> From here the lineage flows out of LOGIKĒ and into <a href="https://davidwise01.github.io/ud0/">PSĒPHOS</a> — the processors — where Boole's algebra, made physical by Shannon, runs a billion times a second on every chip on Earth. The algebra of thought became the engine of the machine. The loop is closed.
+    </div>
+  </div>
+</section>
+
+<footer>
+  CLAUDE SHANNON · LOGIKĒ XII · the closer · two-layer honest<br>
+  live switching circuit (series=AND, parallel=OR, NOT; lamp + truth table + Boolean expression) · exact Boolean minimiser (naïve SOP vs algebra-minimal, gate count falls — honest when it can't, e.g. XOR) · live entropy meter H(p)=−p·log₂p−(1−p)·log₂(1−p)<br>
+  1937 thesis: Boolean algebra = switching circuits → the logic gate · 1948: information theory &amp; the bit · the keystone that folds LOGIKĒ into PSĒPHOS<br>
+  ← <a href="https://davidwise01.github.io/alan-turing/">Turing</a> · the lineage is complete: <b>Thales → … → the gate</b><br>
+  LOGIKĒ · the lineage of logical mathematics · governor David Lee Wise · CC-BY-ND-4.0
+</footer>
+</div>
+<script>
+"use strict";
+// ---------- MODULE I : switching circuit ----------
+(function(){
+  const $=id=>document.getElementById(id);
+  let A=1,B=1,mode='series',inv=false;
+  function val(){ let f = mode==='series' ? (A&B) : (A|B); if(inv) f=f?0:1; return f; }
+  function exprStr(){ const core = mode==='series' ? 'A · B' : 'A + B'; return inv ? '¬( '+core+' )' : core; }
+  function drawCircuit(){
+    const lit=val();
+    const wire='#3a4660', live=getComputedStyle(document.documentElement).getPropertyValue('--one').trim()||'#7fe0a0';
+    const dead=getComputedStyle(document.documentElement).getPropertyValue('--zero').trim()||'#fb7185';
+    function sw(x,y,closed,label){
+      const c=closed?live:dead;
+      return '<circle cx="'+x+'" cy="'+y+'" r="4" fill="'+c+'"/>'+
+             '<circle cx="'+(x+54)+'" cy="'+y+'" r="4" fill="'+c+'"/>'+
+             '<line x1="'+x+'" y1="'+y+'" x2="'+(x+54)+'" y2="'+(closed?y:y-16)+'" stroke="'+c+'" stroke-width="3"/>'+
+             '<text x="'+(x+27)+'" y="'+(y+24)+'" fill="#b3ad9a" font-family="monospace" font-size="12" text-anchor="middle">'+label+' = '+(closed?1:0)+'</text>';
+    }
+    let s='';
+    const bat='<text x="20" y="95" fill="#d9b66a" font-family="monospace" font-size="12">＋</text><line x1="34" y1="60" x2="34" y2="120" stroke="#d9b66a" stroke-width="2"/>';
+    // lamp on right
+    const lc=lit?'#f0d79a':'#3a4660';
+    const lamp='<circle cx="470" cy="90" r="18" fill="'+(lit?'#2a2414':'#11151f')+'" stroke="'+lc+'" stroke-width="2"/>'+
+               '<text x="470" y="95" fill="'+lc+'" font-family="monospace" font-size="13" text-anchor="middle">'+(lit?'☀':'○')+'</text>';
+    if(mode==='series'){
+      s += '<line x1="34" y1="90" x2="120" y2="90" stroke="'+wire+'" stroke-width="3"/>';
+      s += sw(120,90,!!A,'A');
+      s += '<line x1="174" y1="90" x2="230" y2="90" stroke="'+wire+'" stroke-width="3"/>';
+      s += sw(230,90,!!B,'B');
+      s += '<line x1="284" y1="90" x2="452" y2="90" stroke="'+wire+'" stroke-width="3"/>';
+    } else {
+      s += '<line x1="34" y1="90" x2="110" y2="90" stroke="'+wire+'" stroke-width="3"/>';
+      s += '<line x1="110" y1="55" x2="110" y2="125" stroke="'+wire+'" stroke-width="3"/>';
+      s += '<line x1="110" y1="55" x2="150" y2="55" stroke="'+wire+'" stroke-width="3"/>'+ sw(150,55,!!A,'A') +'<line x1="204" y1="55" x2="300" y2="55" stroke="'+wire+'" stroke-width="3"/>';
+      s += '<line x1="110" y1="125" x2="150" y2="125" stroke="'+wire+'" stroke-width="3"/>'+ sw(150,125,!!B,'B') +'<line x1="204" y1="125" x2="300" y2="125" stroke="'+wire+'" stroke-width="3"/>';
+      s += '<line x1="300" y1="55" x2="300" y2="125" stroke="'+wire+'" stroke-width="3"/>';
+      s += '<line x1="300" y1="90" x2="452" y2="90" stroke="'+wire+'" stroke-width="3"/>';
+    }
+    $('cir').innerHTML = bat + s + lamp;
+    $('lampState').textContent = lit?'ON':'OFF';
+    $('lampState').style.color = lit?'var(--one)':'var(--zero)';
+    $('expr').textContent = exprStr() + '  =  ' + lit;
+    drawTT();
+  }
+  function drawTT(){
+    let h='<tr><th>A</th><th>B</th><th>'+exprStr()+'</th></tr>';
+    [[0,0],[0,1],[1,0],[1,1]].forEach(([a,b])=>{
+      let f = mode==='series'?(a&b):(a|b); if(inv) f=f?0:1;
+      const cur = a===A&&b===B;
+      h+='<tr><td'+(cur?' class="lit"':'')+'>'+a+'</td><td'+(cur?' class="lit"':'')+'>'+b+'</td><td class="'+(f?'outone':'outzero')+(cur?' lit':'')+'">'+f+'</td></tr>';
+    });
+    $('tt1').innerHTML=h;
+  }
+  $('swA').onclick=()=>{A^=1; $('swA').textContent='A · '+A; $('swA').classList.toggle('closed',!!A); drawCircuit();};
+  $('swB').onclick=()=>{B^=1; $('swB').textContent='B · '+B; $('swB').classList.toggle('closed',!!B); drawCircuit();};
+  $('mSer').onclick=()=>{mode='series'; $('mSer').classList.add('on'); $('mPar').classList.remove('on'); drawCircuit();};
+  $('mPar').onclick=()=>{mode='parallel'; $('mPar').classList.add('on'); $('mSer').classList.remove('on'); drawCircuit();};
+  $('mNot').onclick=()=>{inv=!inv; $('mNot').classList.toggle('on',inv); drawCircuit();};
+  drawCircuit();
+})();
+
+// ---------- MODULE II : exact Boolean minimiser ----------
+(function(){
+  const $=id=>document.getElementById(id);
+  // out indexed by (A,B): 0=00,1=01,2=10,3=11
+  let out=[0,0,1,1]; // default: F = A
+  const SOPNAMES=['Ā·B̄','Ā·B','A·B̄','A·B'];
+  function minimize(o){
+    const need=new Set(); o.forEach((v,i)=>{if(v)need.add(i);});
+    if(need.size===0) return {expr:'0',terms:0};
+    if(need.size===4) return {expr:'1',terms:0};
+    const cand=[['A',[2,3]],['Ā',[0,1]],['B',[1,3]],['B̄',[0,2]],
+                ['Ā·B̄',[0]],['Ā·B',[1]],['A·B̄',[2]],['A·B',[3]]];
+    const usable=cand.filter(c=>c[1].every(i=>need.has(i)));
+    let best=null;
+    for(let mask=1;mask<(1<<usable.length);mask++){
+      const chosen=[],cov=new Set();
+      for(let i=0;i<usable.length;i++) if(mask&(1<<i)){chosen.push(usable[i]); usable[i][1].forEach(x=>cov.add(x));}
+      if([...need].every(x=>cov.has(x))){
+        const lits=chosen.reduce((s,c)=>s+c[0].replace(/·/g,'').replace(/̄/g,'').length,0);
+        const score=chosen.length*100+lits;
+        if(!best||score<best.score) best={terms:chosen.length,score,expr:chosen.map(c=>c[0]).join('  +  ')};
+      }
+    }
+    return best;
+  }
+  function sop(o){ const t=[]; o.forEach((v,i)=>{if(v)t.push(SOPNAMES[i]);}); return {terms:t.length, expr:t.join('  +  ')||'0'}; }
+  function render(){
+    let h='<tr><th>A</th><th>B</th><th>OUT</th></tr>';
+    [[0,0],[0,1],[1,0],[1,1]].forEach(([a,b],i)=>{
+      h+='<tr><td>'+a+'</td><td>'+b+'</td><td class="o '+(out[i]?'outone':'outzero')+'" data-i="'+i+'">'+out[i]+'</td></tr>';
+    });
+    $('tt2').innerHTML=h;
+    $('tt2').querySelectorAll('td.o').forEach(td=>td.onclick=()=>{const i=+td.dataset.i; out[i]^=1; render();});
+    const s=sop(out), m=minimize(out);
+    $('naiveExpr').textContent=s.expr; $('naiveCount').textContent=(s.terms||0)+(s.terms===1?' product term':' product terms');
+    $('minExpr').textContent=m.expr; $('minCount').textContent=(m.terms||0)+(m.terms===1?' product term':' product terms');
+    const saved = (s.terms||0)-(m.terms||0);
+    $('mMin').classList.toggle('win', saved>0);
+  }
+  render();
+})();
+
+// ---------- MODULE III : entropy meter ----------
+(function(){
+  const $=id=>document.getElementById(id);
+  function H(p){ return (p<=0||p>=1)?0 : -(p*Math.log2(p)+(1-p)*Math.log2(1-p)); }
+  function draw(){
+    const p=parseFloat($('bias').value); const h=H(p);
+    $('pVal').textContent=p.toFixed(2); $('hVal').textContent=h.toFixed(3);
+    const W=520,padL=40,padR=20,padT=10,padB=24, w=W-padL-padR, barH=46;
+    const fill=(h/1)*w;
+    const col = h>0.66?'#7fe0a0':h>0.33?'#fbbf24':'#fb7185';
+    let s='';
+    s+='<rect x="'+padL+'" y="'+padT+'" width="'+w+'" height="'+barH+'" fill="#0c1622" stroke="#2a3346" rx="6"/>';
+    s+='<rect x="'+padL+'" y="'+padT+'" width="'+fill+'" height="'+barH+'" fill="'+col+'" opacity="0.85" rx="6"/>';
+    s+='<text x="'+padL+'" y="'+(padT+barH+18)+'" fill="#7c7660" font-family="monospace" font-size="11">0 bits (certain)</text>';
+    s+='<text x="'+(padL+w)+'" y="'+(padT+barH+18)+'" fill="#7c7660" font-family="monospace" font-size="11" text-anchor="end">1 bit (max, fair coin)</text>';
+    s+='<text x="'+(padL+fill)+'" y="'+(padT-2)+'" fill="'+col+'" font-family="monospace" font-size="12" text-anchor="middle">'+h.toFixed(3)+'</text>';
+    $('entbar').innerHTML=s;
+  }
+  $('bias').oninput=draw; draw();
+})();
+</script>
+</body>
+</html>
