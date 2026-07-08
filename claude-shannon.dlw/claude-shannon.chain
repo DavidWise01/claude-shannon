@@ -1,0 +1,9 @@
+ROOT0-DLW-CHAIN-v1
+index : 1001
+slug  : claude-shannon
+seal  : db5c0a479d057835dad46e5971d7a3265fc9eb02e035beafd266ee43377beeba
+prev  : 3399e79e8c5d424b94561c3f6efe739fd8c3d134f2b5bb02e4c3532a1832f2c8
+link  : 173cb1f1d3c71175fab7ea90f9a0e56817f8c60a0ddc82c70bdacd70b9cf75ff
+head  : 3447d3a0533aaf1e29a8bdc67a9774884fb3ae9dbc8a17064b7a008ca3c4ec90
+
+— the tether: link = sha256(index|slug|seal|prev). the chain head commits to the whole corpus.
